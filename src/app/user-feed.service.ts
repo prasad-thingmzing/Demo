@@ -15,23 +15,7 @@ export const getFeeds = (): {
 
   const catched = Realm.open(databaseOptions).then(realm => {
     console.log('size' + realm.objects(POSTS_SCHEMA).length);
-    const res = realm.objects(POSTS_SCHEMA);
-    const feedArray: IPost[] = [];
-    res.forEach(r => {
-      const value = r.toJSON();
-      const post: IPost = {
-        body: value.body,
-        id: value.id,
-        title: 'FROM DB- ' + value.title,
-        userId: value.userId,
-      };
-
-      feedArray.push(post);
-    });
-
-    return feedArray;
-    // console.log('saved');
-    //console.log(res.forEach(item => console.log(item)));
+    return realm.objects(POSTS_SCHEMA);
   });
 
   const remoteResult = axios
