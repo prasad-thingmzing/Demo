@@ -1,43 +1,27 @@
 import React, {FunctionComponent, useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
-import {getFeeds, IPost} from './user-feed.service';
+import {getFeeds, getListenerFeed, IPost} from './user-feed.service';
 const UserFeedComponent: FunctionComponent = ({}: {}) => {
   const defaultPosts: IPost[] = [];
   const [posts, setPosts] = useState(defaultPosts);
   const [error, setError] = useState('');
   useEffect(() => {
-
     //cached result - this is also taking time now.
-    getFeeds().cachedResult.then(items => {
-      let feedArray: IPost[] = [];
-
-      items.forEach(r => {
-        const value = r.toJSON();
-        const post: IPost = {
-          body: value.body,
-          id: value.id,
-          title: 'FROM DB- ' + value.title,
-          userId: value.userId,
-        };
-
-        feedArray.push(post);
-      });
-      setPosts(feedArray);
+    getListenerFeed({
+      onPostsUpdate(posts: IPost[]) {
+       // console.log(posts);
+        setPosts(posts);
+      },
     });
     getFeeds().remoteResult.then(result => {
-      //delayed for 10 secs
-      setTimeout(() => {
-        result.status === 'success'
-          ? setPosts(result.data)
-          : setError(result.data);
-      }, 10000);
+      //Do nothing. Just api call and forget
     });
   }, []);
 
   return (
     <View>
       {posts.map(post => (
-        <View>
+        <View key={post.id}>
           <Text style={styles.sectionTitle}>{post.title}</Text>
           <Text style={styles.sectionDescription}>{post.body}</Text>
         </View>
